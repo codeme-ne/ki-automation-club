@@ -158,20 +158,32 @@
         
         .hero-path {
             fill: none;
-            stroke: #E7E5E4; /* border color from theme */
+            stroke: #D6D3D1; /* darker gray - visible on cream background */
             stroke-width: 1.5;
-            vector-effect: non-scaling-stroke; /* Keeps stroke thin on resize */
+            vector-effect: non-scaling-stroke;
         }
 
         .hero-path-animated {
             fill: none;
             stroke: #B45309; /* CTA color */
-            stroke-width: 1.5;
-            stroke-dasharray: 10, 800; /* Short dash, long gap */
+            stroke-width: 2;
+            stroke-dasharray: 15, 800; /* Slightly longer dash */
             stroke-linecap: round;
-            opacity: 0.6;
+            opacity: 0.8; /* More visible */
             animation: dashFlow 8s linear infinite;
             vector-effect: non-scaling-stroke;
+        }
+
+        /* Make animations more visible on mobile */
+        @media (max-width: 768px) {
+            .hero-path {
+                stroke-width: 2;
+                stroke: #C8C4C0; /* even darker on mobile */
+            }
+            .hero-path-animated {
+                stroke-width: 3;
+                opacity: 1;
+            }
         }
 
         .hero-dot {
