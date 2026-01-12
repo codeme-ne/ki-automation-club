@@ -797,8 +797,8 @@
         // Intersection Observer for Scroll Animations
         const observerOptions = {
             root: null,
-            rootMargin: '0px',
-            threshold: 0.1
+            rootMargin: '-50px 0px', // Trigger 50px after element enters viewport
+            threshold: 0.15
         };
 
         const observer = new IntersectionObserver((entries, observer) => {
@@ -810,8 +810,11 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
-            observer.observe(element);
+        // Delay observer setup to prevent immediate firing on page load
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
+                observer.observe(element);
+            });
         });
     </script>
 
