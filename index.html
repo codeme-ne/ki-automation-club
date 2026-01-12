@@ -26,6 +26,20 @@
                     fontFamily: {
                         heading: ['Fraunces', 'Georgia', 'serif'],
                         body: ['Source Sans 3', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(180, 83, 9, 0.15)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
                     }
                 }
             }
@@ -73,6 +87,23 @@
             letter-spacing: -0.02em;
         }
 
+        /* Scroll Reveal Animation */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delays for children */
+        .stagger-delay-1 { transition-delay: 100ms; }
+        .stagger-delay-2 { transition-delay: 200ms; }
+        .stagger-delay-3 { transition-delay: 300ms; }
+
         /* FAQ accordion animations */
         details summary::-webkit-details-marker {
             display: none;
@@ -111,6 +142,49 @@
             border-left: 3px solid #B45309;
             padding-left: 1.5rem;
         }
+
+        /* Hero SVG Background */
+        .hero-svg-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+        }
+        
+        .hero-path {
+            fill: none;
+            stroke: #E7E5E4; /* border color from theme */
+            stroke-width: 1.5;
+            vector-effect: non-scaling-stroke; /* Keeps stroke thin on resize */
+        }
+
+        .hero-path-animated {
+            fill: none;
+            stroke: #B45309; /* CTA color */
+            stroke-width: 1.5;
+            stroke-dasharray: 10, 800; /* Short dash, long gap */
+            stroke-linecap: round;
+            opacity: 0.6;
+            animation: dashFlow 8s linear infinite;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .hero-dot {
+            fill: #FAF9F7; /* background color */
+            stroke: #B45309;
+            stroke-width: 2;
+        }
+
+        @keyframes dashFlow {
+            to {
+                stroke-dashoffset: -810;
+            }
+        }
     </style>
 </head>
 <body class="font-body text-text bg-background scroll-smooth">
@@ -133,30 +207,78 @@
 
     <!-- HERO SECTION -->
     <section class="min-h-screen flex items-center px-4 pt-28 pb-20 relative">
-        <!-- Decorative line -->
+        <!-- Animated Background Lines (SVG) -->
+        <div class="hero-svg-container">
+            <svg width="100%" height="100%" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <!-- Defs for reuse if needed -->
+                <defs>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- 
+                     Top Line: Starts left, curves UP over title, ends right 
+                     M 0,350 L 300,350 Q 350,350 350,300 L 350,200 Q 350,150 400,150 L 1040,150 Q 1090,150 1090,200 L 1090,250 Q 1090,300 1140,300 L 1440,300
+                -->
+                <path d="M -100,380 L 200,380 Q 250,380 250,330 L 250,230 Q 250,180 300,180 L 1140,180 Q 1190,180 1190,230 L 1190,280 Q 1190,330 1240,330 L 1540,330" 
+                      class="hero-path" />
+                
+                <!-- Animated Dash for Top Line -->
+                <path d="M -100,380 L 200,380 Q 250,380 250,330 L 250,230 Q 250,180 300,180 L 1140,180 Q 1190,180 1190,230 L 1190,280 Q 1190,330 1240,330 L 1540,330" 
+                      class="hero-path-animated" />
+
+                <!-- 
+                     Bottom Line: Starts left, curves DOWN under buttons, ends right 
+                     M 0,450 L 150,450 Q 200,450 200,500 L 200,600 Q 200,650 250,650 L 900,650 Q 950,650 950,600 L 950,550 Q 950,500 1000,500 L 1440,500
+                -->
+                <path d="M -100,500 L 150,500 Q 200,500 200,550 L 200,650 Q 200,700 250,700 L 950,700 Q 1000,700 1000,650 L 1000,600 Q 1000,550 1050,550 L 1540,550" 
+                      class="hero-path" />
+                
+                <!-- Animated Dash for Bottom Line -->
+                <path d="M -100,500 L 150,500 Q 200,500 200,550 L 200,650 Q 200,700 250,700 L 950,700 Q 1000,700 1000,650 L 1000,600 Q 1000,550 1050,550 L 1540,550" 
+                      class="hero-path-animated" style="animation-delay: -4s;" />
+
+            </svg>
+        </div>
+
+        <!-- Decorative line (Legacy - keeping hidden as requested or remove if conflict) -->
+        <div class="absolute top-32 left-8 w-px h-32 bg-gradient-to-b from-transparent via-border to-transparent hidden lg:block opacity-30"></div>
         <div class="absolute top-32 left-8 w-px h-32 bg-gradient-to-b from-transparent via-border to-transparent hidden lg:block"></div>
 
         <div class="max-w-5xl mx-auto relative z-10">
-            <!-- Eyebrow -->
-            <p class="text-sm font-medium text-cta tracking-wide uppercase mb-6">Für Coaches & Trainer im DACH-Raum</p>
+            <!-- Glow Effect behind text -->
+            <div class="absolute -top-20 -left-20 w-96 h-96 bg-cta/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
-            <h1 class="font-heading text-4xl md:text-5xl lg:text-[3.5rem] font-semibold text-text mb-6 leading-[1.1]">
-                KI & Automatisierungs-Club
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cta/10 text-cta border border-cta/20 text-xs font-semibold tracking-wide uppercase mb-8 shadow-glow transition-transform hover:scale-105 cursor-default reveal-on-scroll">
+                <span class="w-1.5 h-1.5 rounded-full bg-cta animate-pulse"></span>
+                Für Coaches & Trainer im DACH-Raum
+            </div>
+
+            <h1 class="font-heading text-5xl md:text-7xl lg:text-[5rem] font-bold text-text mb-8 leading-[1] tracking-tight reveal-on-scroll stagger-delay-1">
+                KI & Automatisierungs-<br>Club
             </h1>
 
-            <p class="text-lg text-muted mb-10 max-w-2xl leading-relaxed">
-                Du verkaufst Transformation, verbringst aber 30% deiner Zeit mit Verwaltung? Wir zeigen dir, wie du Prozesse automatisierst. <span class="text-text font-medium">Ohne Informatik-Studium. Dafür mit System.</span>
+            <p class="text-xl md:text-2xl text-muted mb-12 max-w-2xl leading-relaxed reveal-on-scroll stagger-delay-2">
+                Du verkaufst Transformation, verbringst aber 30% deiner Zeit mit Verwaltung? Wir zeigen dir, wie du Prozesse automatisierst. <span class="text-text font-medium border-b-2 border-cta/20">Ohne Informatik-Studium.</span>
             </p>
 
-            <div class="flex flex-col sm:flex-row items-start gap-4 mb-12">
-                <a href="#pricing" class="inline-block bg-cta hover:bg-cta-hover text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 cursor-pointer">
+            <div class="flex flex-col sm:flex-row items-start gap-4 mb-16 reveal-on-scroll stagger-delay-3">
+                <a href="#pricing" class="inline-flex items-center justify-center bg-cta hover:bg-cta-hover text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg hover:shadow-glow hover:-translate-y-1">
                     Mitglied werden — 300€/Jahr
                 </a>
-                <p class="text-sm text-muted self-center">Weniger als eine Coaching-Stunde.</p>
+                <div class="flex flex-col justify-center h-14">
+                    <p class="text-sm text-muted">Weniger als eine Coaching-Stunde.</p>
+                </div>
             </div>
 
             <!-- Social proof - horizontal line style -->
-            <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted pt-8 border-t border-border">
+            <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted pt-8 border-t border-border reveal-on-scroll stagger-delay-3">
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-cta rounded-full"></span>
                     <span>Mind. 10 Live-Calls/Jahr</span>
@@ -175,7 +297,7 @@
 
     <!-- PAIN POINTS -->
     <section class="py-24 px-4 bg-white">
-        <div class="max-w-5xl mx-auto">
+        <div class="max-w-5xl mx-auto reveal-on-scroll">
             <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">Das Problem</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-16 max-w-2xl">
                 Erkennst du deinen Arbeitstag wieder?
@@ -183,26 +305,26 @@
 
             <div class="space-y-6">
                 <!-- Pain 1 - Full width -->
-                <div class="bg-background p-8 rounded-lg border-l-2 border-cta">
+                <div class="bg-background p-8 rounded-lg border-l-2 border-cta hover:shadow-lg transition-shadow duration-300 reveal-on-scroll stagger-delay-1">
                     <p class="text-sm text-cta font-medium mb-2">22:00 Uhr</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Die späte E-Mail</h3>
                     <p class="text-muted max-w-2xl">Du beantwortest Standard-Anfragen spät abends selbst, weil du niemandem zutraust (oder kein Geld hast), es für dich zu tun.</p>
                 </div>
 
                 <!-- Pain 2 & 3 - Two columns -->
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-background p-8 rounded-lg">
+                <div class="grid md:grid-cols-2 gap-6 reveal-on-scroll stagger-delay-2">
+                    <div class="bg-background p-8 rounded-lg hover:shadow-lg transition-shadow duration-300">
                         <h3 class="font-heading font-semibold text-xl mb-3">Das Content-Hamsterrad</h3>
                         <p class="text-muted">Du weißt, du müsstest posten. Aber Blogartikel schreiben und Newsletter formatieren frisst genau die Zeit, die du für Akquise bräuchtest.</p>
                     </div>
-                    <div class="bg-background p-8 rounded-lg">
+                    <div class="bg-background p-8 rounded-lg hover:shadow-lg transition-shadow duration-300">
                         <h3 class="font-heading font-semibold text-xl mb-3">Das „Zapier-Loch"</h3>
                         <p class="text-muted">Du wolltest „nur kurz" was automatisieren. 4 Stunden später hast du 12 Tabs offen, nichts funktioniert, und du bist genervt.</p>
                     </div>
                 </div>
 
                 <!-- Pain 4 - Highlight box -->
-                <div class="bg-primary/5 p-8 rounded-lg border border-primary/10">
+                <div class="bg-primary/5 p-8 rounded-lg border border-primary/10 reveal-on-scroll stagger-delay-3">
                     <h3 class="font-heading font-semibold text-xl mb-3">Die Angst, den Anschluss zu verlieren</h3>
                     <p class="text-muted">Überall ploppen „KI-Experten" auf. Du fragst dich: <span class="text-text font-medium">Überholt mich der Markt gerade, während ich noch Rechnungen abtippe?</span></p>
                 </div>
@@ -212,12 +334,12 @@
 
     <!-- SOLUTION -->
     <section class="py-20 px-4 bg-primary text-white">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-4xl mx-auto reveal-on-scroll">
             <p class="text-sm font-medium text-white/60 tracking-wide uppercase mb-4">Die Lösung</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-8 leading-tight">
                 Schluss mit Raten.<br>Wir zeigen dir, was funktioniert.
             </h2>
-            <div class="space-y-6 text-lg text-white/90 max-w-2xl">
+            <div class="space-y-6 text-lg text-white/90 max-w-2xl reveal-on-scroll stagger-delay-1">
                 <p>
                     In unserer Community filtern wir den Lärm. Wir zeigen dir nicht die 100 neuesten Tools, sondern exakt die paar wenigen, die du als Trainer oder Coach wirklich brauchst.
                 </p>
@@ -229,62 +351,132 @@
     </section>
 
     <!-- FEATURES -->
-    <section class="py-24 px-4 bg-background">
-        <div class="max-w-5xl mx-auto">
-            <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">Was du bekommst</p>
-            <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-16 max-w-xl">
-                Dein Werkzeugkasten für mehr Freiheit
-            </h2>
+    <section class="py-24 px-4 bg-background relative overflow-hidden">
+        <!-- Animated Background Lines (SVG) - Features -->
+        <div class="hero-svg-container" style="mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); mask-composite: intersect; -webkit-mask-composite: source-in;">
+            <svg width="100%" height="100%" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <!-- 
+                     Feature Flow: Vertical line coming from top center, splitting to connect cards
+                -->
+                <!-- Main vertical trunk from top -->
+                <path d="M 720,-50 L 720,100" class="hero-path" />
+                
+                <!-- Split to left big card - Curving OUT at end -->
+                <path d="M 720,100 Q 720,150 670,150 L 300,150 Q 250,150 250,200 L 250,300 Q 250,350 200,350 L 50,350" class="hero-path" />
+                
+                <!-- Split to right small cards grid - Continuing DOWN -->
+                <path d="M 720,100 Q 720,150 770,150 L 1100,150 Q 1150,150 1150,200 L 1150,850" class="hero-path" />
 
-            <!-- Feature 1 - Highlighted -->
-            <div class="bg-white p-8 md:p-10 rounded-lg border border-border mb-8">
-                <div class="flex flex-col md:flex-row md:items-start gap-8">
-                    <div class="md:w-2/3">
-                        <p class="text-sm text-cta font-medium mb-3">Kernstück</p>
-                        <h3 class="font-heading font-semibold text-2xl mb-4">Konkrete Kurse & Trainings</h3>
-                        <p class="text-muted mb-6">Keine graue Theorie, sondern didaktisch aufbereitete Anleitungen für die Praxis.</p>
-                    </div>
-                    <div class="md:w-1/3 space-y-3 text-sm">
-                        <div class="flex items-start gap-3">
-                            <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2 flex-shrink-0"></span>
-                            <span class="text-muted">KI-Crashkurs: Die Basics sicher beherrschen</span>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2 flex-shrink-0"></span>
-                            <span class="text-muted">Prompt-Design & Context-Engineering</span>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2 flex-shrink-0"></span>
-                            <span class="text-muted">KI-Contentmaschine: Blog, Social, Newsletter</span>
-                        </div>
-                    </div>
+                <!-- Animated Dashes -->
+                <path d="M 720,-50 L 720,100" class="hero-path-animated" style="animation-duration: 4s;" />
+                
+                <!-- Left branch curving outward and fading -->
+                <path d="M 720,100 Q 720,150 670,150 L 300,150 Q 250,150 250,200 L 250,300 Q 250,350 200,350 L 50,350" class="hero-path-animated" style="animation-delay: 2s; animation-duration: 7s;" />
+                
+                <!-- Right branch splitting and continuing down -->
+                <path d="M 720,100 Q 720,150 770,150 L 1100,150 Q 1150,150 1150,200 L 1150,850" class="hero-path-animated" style="animation-delay: 2s; animation-duration: 9s;" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-16 reveal-on-scroll">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background border border-border text-xs font-semibold tracking-wide uppercase mb-4 text-muted">
+                    Was du bekommst
                 </div>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold max-w-xl mx-auto leading-tight">
+                    Dein Werkzeugkasten für mehr Freiheit
+                </h2>
             </div>
 
-            <!-- Features 2-4 - Grid -->
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="p-6">
-                    <h3 class="font-heading font-semibold text-lg mb-3">Offene Werkstatt</h3>
-                    <p class="text-muted text-sm mb-3">Mind. 10x im Jahr: Du hängst irgendwo? Dein Workflow klemmt?</p>
-                    <p class="text-muted text-sm">Live-Calls mit Bildschirm-Sharing. Wir lösen den Knoten sofort.</p>
+            <!-- Bento Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[minmax(180px,auto)]">
+                
+                <!-- Card 1: Kurse (Large) -->
+                <div class="md:col-span-2 bg-white rounded-2xl border border-border/60 p-8 md:p-10 relative overflow-hidden group hover:shadow-card-hover transition-all duration-300 reveal-on-scroll">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-cta/5 rounded-full blur-3xl -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-150"></div>
+                    
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 bg-cta/10 rounded-lg flex items-center justify-center mb-6 text-cta">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            </div>
+                            <h3 class="font-heading font-semibold text-2xl mb-3">Konkrete Kurse & Trainings</h3>
+                            <p class="text-muted text-lg mb-6 max-w-md">Keine graue Theorie. Wir liefern didaktisch aufbereitete Anleitungen, die du sofort umsetzen kannst.</p>
+                        </div>
+                        
+                        <div class="grid sm:grid-cols-2 gap-4 mt-auto">
+                            <div class="flex items-center gap-3 text-sm font-medium text-primary">
+                                <span class="w-1.5 h-1.5 bg-cta rounded-full"></span>
+                                KI-Crashkurs Basics
+                            </div>
+                            <div class="flex items-center gap-3 text-sm font-medium text-primary">
+                                <span class="w-1.5 h-1.5 bg-cta rounded-full"></span>
+                                Prompt-Design
+                            </div>
+                            <div class="flex items-center gap-3 text-sm font-medium text-primary">
+                                <span class="w-1.5 h-1.5 bg-cta rounded-full"></span>
+                                Content-Maschine
+                            </div>
+                            <div class="flex items-center gap-3 text-sm font-medium text-primary">
+                                <span class="w-1.5 h-1.5 bg-cta rounded-full"></span>
+                                Automatisierung 101
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6 border-l border-border">
-                    <h3 class="font-heading font-semibold text-lg mb-3">Community & Forum</h3>
-                    <p class="text-muted text-sm mb-3">Fragen kennen keine Öffnungszeiten.</p>
-                    <p class="text-muted text-sm">Poste jederzeit deine Herausforderungen. Die Community hilft.</p>
+
+                <!-- Card 2: Werkstatt (Tall/Standard) -->
+                <div class="bg-white rounded-2xl border border-border/60 p-8 relative overflow-hidden group hover:shadow-card-hover transition-all duration-300 reveal-on-scroll stagger-delay-1">
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cta to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    <div class="w-10 h-10 bg-primary/5 rounded-lg flex items-center justify-center mb-6 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </div>
+                    <h3 class="font-heading font-semibold text-xl mb-3">Offene Werkstatt</h3>
+                    <p class="text-muted text-sm mb-4">Mind. 10x im Jahr Live-Calls mit Bildschirm-Sharing. Wir lösen deinen Knoten sofort.</p>
                 </div>
-                <div class="p-6 border-l border-border">
-                    <h3 class="font-heading font-semibold text-lg mb-3">Fertige Blueprints</h3>
-                    <p class="text-muted text-sm mb-3">Warum das Rad neu erfinden?</p>
-                    <p class="text-muted text-sm">Fertige Automatisierungs-Dateien. Herunterladen, importieren, fertig.</p>
+
+                <!-- Card 3: Community (Standard) -->
+                <div class="bg-primary text-white rounded-2xl border border-primary-dark p-8 relative overflow-hidden group hover:shadow-card-hover transition-all duration-300 reveal-on-scroll">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
+                    
+                    <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mb-6 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3 class="font-heading font-semibold text-xl mb-3">Community & Forum</h3>
+                    <p class="text-white/80 text-sm">Fragen kennen keine Öffnungszeiten. Die Community hilft dir jederzeit weiter.</p>
                 </div>
+
+                <!-- Card 4: Blueprints (Large, span 2) -->
+                <div class="md:col-span-2 bg-cream rounded-2xl border border-border/60 p-8 md:p-10 relative overflow-hidden group hover:shadow-card-hover transition-all duration-300 reveal-on-scroll stagger-delay-1">
+                    <div class="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+                        <div class="flex-1">
+                            <div class="w-10 h-10 bg-cta/10 rounded-lg flex items-center justify-center mb-6 text-cta">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            </div>
+                            <h3 class="font-heading font-semibold text-2xl mb-3">Fertige Blueprints</h3>
+                            <p class="text-muted">Warum das Rad neu erfinden? Wir liefern fertige Automatisierungs-Dateien (z.B. für Make.com). Herunterladen, importieren, fertig.</p>
+                        </div>
+                        <div class="w-full md:w-1/3 bg-white rounded-xl border border-border/50 p-4 shadow-sm rotate-3 transition-transform group-hover:rotate-0">
+                            <div class="space-y-2">
+                                <div class="h-2 bg-border/30 rounded w-3/4"></div>
+                                <div class="h-2 bg-border/30 rounded w-full"></div>
+                                <div class="h-2 bg-border/30 rounded w-5/6"></div>
+                                <div class="flex gap-2 mt-4">
+                                    <div class="h-8 w-full bg-cta/10 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
     <!-- HOW IT WORKS -->
     <section class="py-24 px-4 bg-white">
-        <div class="max-w-5xl mx-auto">
+        <div class="max-w-5xl mx-auto reveal-on-scroll">
             <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">Der Ablauf</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-16 max-w-md">
                 So läuft das hier
@@ -292,19 +484,19 @@
 
             <div class="grid md:grid-cols-3 gap-12">
                 <!-- Step 1 -->
-                <div>
+                <div class="reveal-on-scroll stagger-delay-1">
                     <p class="font-heading text-5xl font-semibold text-border mb-4">01</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Check-In</h3>
                     <p class="text-muted">Du meldest dich an und startest direkt mit den ersten Inhalten und dem Zugang zur Community.</p>
                 </div>
                 <!-- Step 2 -->
-                <div>
+                <div class="reveal-on-scroll stagger-delay-2">
                     <p class="font-heading text-5xl font-semibold text-border mb-4">02</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Quick-Win</h3>
                     <p class="text-muted">Du suchst dir ein konkretes Problem. Du schaust das kurze Video. Du nutzt unsere Vorlage. Unter 30 Minuten.</p>
                 </div>
                 <!-- Step 3 -->
-                <div>
+                <div class="reveal-on-scroll stagger-delay-3">
                     <p class="font-heading text-5xl font-semibold text-border mb-4">03</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Evolution</h3>
                     <p class="text-muted">Monat für Monat automatisierst du einen weiteren Bereich. Dein Business wird ruhiger und skalierbarer.</p>
@@ -314,8 +506,24 @@
     </section>
 
     <!-- TEAM -->
-    <section class="py-24 px-4 bg-background">
-        <div class="max-w-5xl mx-auto">
+    <section class="py-24 px-4 bg-background relative overflow-hidden">
+        <!-- Animated Background Lines (SVG) - Team -->
+        <div class="hero-svg-container" style="mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);">
+            <svg width="100%" height="100%" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <!-- 
+                     Team Flow: Vertical line re-appearing from top (continuation from features), flowing through team grid on the RIGHT
+                -->
+                <!-- Re-appearing line from top right (matching previous section exit X approx 1150), staying right -->
+                <path d="M 1150,-50 L 1150,150 Q 1150,200 1200,200 L 1250,200 Q 1300,200 1300,250 L 1300,700" 
+                      class="hero-path" />
+                
+                <!-- Animated Dash -->
+                <path d="M 1150,-50 L 1150,150 Q 1150,200 1200,200 L 1250,200 Q 1300,200 1300,250 L 1300,700" 
+                      class="hero-path-animated" style="animation-duration: 8s;" />
+            </svg>
+        </div>
+
+        <div class="max-w-5xl mx-auto relative z-10 reveal-on-scroll">
             <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">Das Team</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-6 max-w-lg">
                 Wer dich begleitet
@@ -324,22 +532,31 @@
 
             <div class="grid md:grid-cols-3 gap-10">
                 <!-- Marian -->
-                <div>
-                    <img src="images/marian-zefferer.jpg" alt="Marian Zefferer" class="w-20 h-20 rounded-full mb-5 object-cover object-[center_25%] grayscale hover:grayscale-0 transition-all duration-300">
+                <div class="reveal-on-scroll stagger-delay-1">
+                    <div class="relative w-20 h-20 mb-5 group cursor-pointer">
+                        <div class="absolute inset-0 bg-cta/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img src="images/marian-zefferer.jpg" alt="Marian Zefferer" class="relative w-20 h-20 rounded-full object-cover object-[center_25%] grayscale hover:grayscale-0 transition-all duration-300 hover:scale-110">
+                    </div>
                     <p class="text-sm text-cta font-medium mb-1">Psychologie</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Marian Zefferer</h3>
                     <p class="text-muted text-sm">NLP-Lehrtrainer und Online-Didaktik-Profi. 4.000+ Stunden Online-Training. Die Technik passt sich dir an.</p>
                 </div>
                 <!-- Stephan -->
-                <div>
-                    <img src="images/stephan-landsiedel.png" alt="Stephan Landsiedel" class="w-20 h-20 rounded-full mb-5 object-cover grayscale hover:grayscale-0 transition-all duration-300">
+                <div class="reveal-on-scroll stagger-delay-2">
+                    <div class="relative w-20 h-20 mb-5 group cursor-pointer">
+                        <div class="absolute inset-0 bg-cta/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img src="images/stephan-landsiedel.png" alt="Stephan Landsiedel" class="relative w-20 h-20 rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-300 hover:scale-110">
+                    </div>
                     <p class="text-sm text-cta font-medium mb-1">Strategie</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Stephan Landsiedel</h3>
                     <p class="text-muted text-sm">Unternehmer mit Millionen-Business. Unternehmerisch sinnvoll automatisieren, nicht nur basteln.</p>
                 </div>
                 <!-- Lukas -->
-                <div>
-                    <img src="images/lukas-zangerl.png" alt="Lukas Zangerl" class="w-20 h-20 rounded-full mb-5 object-cover grayscale hover:grayscale-0 transition-all duration-300">
+                <div class="reveal-on-scroll stagger-delay-3">
+                    <div class="relative w-20 h-20 mb-5 group cursor-pointer">
+                        <div class="absolute inset-0 bg-cta/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img src="images/lukas-zangerl.png" alt="Lukas Zangerl" class="relative w-20 h-20 rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-300 hover:scale-110">
+                    </div>
                     <p class="text-sm text-cta font-medium mb-1">Technik</p>
                     <h3 class="font-heading font-semibold text-xl mb-3">Lukas Zangerl</h3>
                     <p class="text-muted text-sm">Ex-Linienpilot, Data Science & KI-Consultant. Trennt täglich Hype vom echten Nutzen.</p>
@@ -350,14 +567,14 @@
 
     <!-- ROI CALCULATION -->
     <section class="py-24 px-4 bg-white">
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-3xl mx-auto reveal-on-scroll">
             <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">Die Rechnung</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-10">
                 Rechnen wir mal kurz nach.
             </h2>
 
             <div class="space-y-6 text-lg text-muted">
-                <p>Was ist dein Stundensatz? <span class="text-text font-medium">150€? 300€?</span></p>
+                <p>Was ist dein Stundensatz? <span class="text-text font-medium border-b-2 border-cta/20">150€? 300€?</span></p>
                 <p>
                     Die Mitgliedschaft kostet <span class="text-text font-medium">300€ im Jahr</span>.
                     Wenn du durch unsere Blueprints auch nur zwei Stunden sparst, hast du das Geld wieder drin.
@@ -374,32 +591,44 @@
 
     <!-- PRICING -->
     <section id="pricing" class="py-24 px-4 bg-primary">
-        <div class="max-w-2xl mx-auto">
-            <div class="bg-white rounded-lg p-8 md:p-12">
-                <p class="text-sm text-cta font-medium mb-2">Einführungspreis</p>
+        <div class="max-w-2xl mx-auto reveal-on-scroll">
+            <div class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-cta/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                
+                <p class="text-sm text-cta font-medium mb-2 uppercase tracking-wide">Einführungspreis</p>
                 <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-8">
                     Das Angebot auf einen Blick
                 </h2>
 
                 <div class="space-y-4 mb-10 text-muted">
                     <div class="flex items-start gap-3">
-                        <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2.5 flex-shrink-0"></span>
+                        <div class="w-6 h-6 rounded-full bg-cta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
                         <span>Jahreszugang zur Community & Forum</span>
                     </div>
                     <div class="flex items-start gap-3">
-                        <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2.5 flex-shrink-0"></span>
+                        <div class="w-6 h-6 rounded-full bg-cta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
                         <span>Mindestens 10 Live-Calls pro Jahr</span>
                     </div>
                     <div class="flex items-start gap-3">
-                        <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2.5 flex-shrink-0"></span>
+                        <div class="w-6 h-6 rounded-full bg-cta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
                         <span>Zugriff auf alle Video-Anleitungen</span>
                     </div>
                     <div class="flex items-start gap-3">
-                        <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2.5 flex-shrink-0"></span>
+                        <div class="w-6 h-6 rounded-full bg-cta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
                         <span>Downloadbare Files & Templates</span>
                     </div>
                     <div class="flex items-start gap-3">
-                        <span class="w-1.5 h-1.5 bg-cta rounded-full mt-2.5 flex-shrink-0"></span>
+                        <div class="w-6 h-6 rounded-full bg-cta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
                         <span>Laufend neue Updates zu KI-Tools</span>
                     </div>
                 </div>
@@ -414,10 +643,10 @@
                     <p class="text-sm text-muted">Das sind nur €25/Monat. Jederzeit kündbar.</p>
                 </div>
 
-                <a href="https://communi.com/ki-automation/checkout" class="block w-full bg-cta hover:bg-cta-hover text-white font-semibold py-4 rounded-lg text-lg transition-colors duration-200 cursor-pointer text-center">
+                <a href="https://communi.com/ki-automation/checkout" class="block w-full bg-cta hover:bg-cta-hover text-white font-semibold py-4 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer text-center relative z-10">
                     Jetzt Mitglied werden
                 </a>
-                <p class="text-center mt-4">
+                <p class="text-center mt-4 relative z-10">
                     <a href="https://communi.com/login?gs=ki-automation" class="text-sm text-muted hover:text-text transition-colors">Bereits Mitglied? Einloggen</a>
                 </p>
             </div>
@@ -426,64 +655,99 @@
 
     <!-- FAQ -->
     <section class="py-24 px-4 bg-background">
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-3xl mx-auto reveal-on-scroll">
             <p class="text-sm font-medium text-muted tracking-wide uppercase mb-4">FAQ</p>
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-12">
                 Häufige Fragen
             </h2>
 
-            <div class="space-y-0 divide-y divide-border">
+            <div class="space-y-4">
                 <!-- FAQ 1 -->
-                <details class="group py-6">
-                    <summary class="flex items-center justify-between cursor-pointer">
+                <details class="group bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow duration-300">
+                    <summary class="flex items-center justify-between cursor-pointer list-none">
                         <span class="font-heading font-medium text-lg pr-4">Ich bin technisch wirklich unbegabt.</span>
-                        <span class="text-muted group-open:rotate-45 transition-transform text-xl">+</span>
+                        <span class="text-cta group-open:rotate-45 transition-transform duration-300 text-2xl font-light">+</span>
                     </summary>
-                    <p class="pt-4 text-muted max-w-2xl">Genau deshalb bist du hier richtig. Wenn du eine E-Mail öffnen kannst, wirst du auch unsere Anleitungen verstehen.</p>
+                    <div class="pt-4 text-muted max-w-2xl border-t border-border mt-4">
+                        <p>Genau deshalb bist du hier richtig. Wenn du eine E-Mail öffnen kannst, wirst du auch unsere Anleitungen verstehen.</p>
+                    </div>
                 </details>
 
                 <!-- FAQ 2 -->
-                <details class="group py-6">
-                    <summary class="flex items-center justify-between cursor-pointer">
+                <details class="group bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow duration-300">
+                    <summary class="flex items-center justify-between cursor-pointer list-none">
                         <span class="font-heading font-medium text-lg pr-4">Noch eine Community? Ich habe keine Zeit dafür.</span>
-                        <span class="text-muted group-open:rotate-45 transition-transform text-xl">+</span>
+                        <span class="text-cta group-open:rotate-45 transition-transform duration-300 text-2xl font-light">+</span>
                     </summary>
-                    <p class="pt-4 text-muted max-w-2xl">Das ist kein Kaffeekränzchen. Du kommst rein, wenn du ein Problem hast, holst dir die Lösung und gehst wieder arbeiten.</p>
+                    <div class="pt-4 text-muted max-w-2xl border-t border-border mt-4">
+                        <p>Das ist kein Kaffeekränzchen. Du kommst rein, wenn du ein Problem hast, holst dir die Lösung und gehst wieder arbeiten.</p>
+                    </div>
                 </details>
 
                 <!-- FAQ 3 -->
-                <details class="group py-6">
-                    <summary class="flex items-center justify-between cursor-pointer">
+                <details class="group bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow duration-300">
+                    <summary class="flex items-center justify-between cursor-pointer list-none">
                         <span class="font-heading font-medium text-lg pr-4">Wieso jetzt?</span>
-                        <span class="text-muted group-open:rotate-45 transition-transform text-xl">+</span>
+                        <span class="text-cta group-open:rotate-45 transition-transform duration-300 text-2xl font-light">+</span>
                     </summary>
-                    <p class="pt-4 text-muted max-w-2xl">KI ist kein vorübergehender Trend, sondern der neue Standard. Wer jetzt investiert, sichert sich einen Wettbewerbsvorteil.</p>
+                    <div class="pt-4 text-muted max-w-2xl border-t border-border mt-4">
+                        <p>KI ist kein vorübergehender Trend, sondern der neue Standard. Wer jetzt investiert, sichert sich einen Wettbewerbsvorteil.</p>
+                    </div>
                 </details>
 
                 <!-- FAQ 4 -->
-                <details class="group py-6">
-                    <summary class="flex items-center justify-between cursor-pointer">
+                <details class="group bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow duration-300">
+                    <summary class="flex items-center justify-between cursor-pointer list-none">
                         <span class="font-heading font-medium text-lg pr-4">Brauche ich teure Software dazu?</span>
-                        <span class="text-muted group-open:rotate-45 transition-transform text-xl">+</span>
+                        <span class="text-cta group-open:rotate-45 transition-transform duration-300 text-2xl font-light">+</span>
                     </summary>
-                    <p class="pt-4 text-muted max-w-2xl">Wir fokussieren uns auf Tools, die entweder kostenlos sind oder einen sehr hohen Mehrwert haben.</p>
+                    <div class="pt-4 text-muted max-w-2xl border-t border-border mt-4">
+                        <p>Wir fokussieren uns auf Tools, die entweder kostenlos sind oder einen sehr hohen Mehrwert haben.</p>
+                    </div>
                 </details>
 
                 <!-- FAQ 5 -->
-                <details class="group py-6">
-                    <summary class="flex items-center justify-between cursor-pointer">
+                <details class="group bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow duration-300">
+                    <summary class="flex items-center justify-between cursor-pointer list-none">
                         <span class="font-heading font-medium text-lg pr-4">Kann ich jederzeit einsteigen?</span>
-                        <span class="text-muted group-open:rotate-45 transition-transform text-xl">+</span>
+                        <span class="text-cta group-open:rotate-45 transition-transform duration-300 text-2xl font-light">+</span>
                     </summary>
-                    <p class="pt-4 text-muted max-w-2xl">Ja. Starte jetzt und du erhältst sofortigen Zugang für ein ganzes Jahr – inklusive aller Updates.</p>
+                    <div class="pt-4 text-muted max-w-2xl border-t border-border mt-4">
+                        <p>Ja. Starte jetzt und du erhältst sofortigen Zugang für ein ganzes Jahr – inklusive aller Updates.</p>
+                    </div>
                 </details>
             </div>
         </div>
     </section>
 
     <!-- FINAL CTA -->
-    <section class="py-24 px-4 bg-primary text-white">
-        <div class="max-w-3xl mx-auto">
+    <section class="py-24 px-4 bg-primary text-white relative overflow-hidden">
+        <!-- Animated Background Lines (SVG) - Footer/CTA -->
+        <div class="hero-svg-container">
+            <svg width="100%" height="100%" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <!-- 
+                     Top Line: Coming from left, dipping down to embrace content 
+                -->
+                <path d="M -100,100 L 200,100 Q 250,100 250,150 L 250,250 Q 250,300 300,300 L 1140,300 Q 1190,300 1190,250 L 1190,200 Q 1190,150 1240,150 L 1540,150" 
+                      class="hero-path" style="stroke: rgba(255,255,255,0.1);" />
+                
+                <!-- Animated Dash -->
+                <path d="M -100,100 L 200,100 Q 250,100 250,150 L 250,250 Q 250,300 300,300 L 1140,300 Q 1190,300 1190,250 L 1190,200 Q 1190,150 1240,150 L 1540,150" 
+                      class="hero-path-animated" style="stroke: rgba(255,255,255,0.3); animation-delay: -2s;" />
+
+                <!-- 
+                     Bottom Line: Coming from left, curving up to embrace content from below
+                -->
+                <path d="M -100,500 L 150,500 Q 200,500 200,450 L 200,400 Q 200,350 250,350 L 950,350 Q 1000,350 1000,400 L 1000,450 Q 1000,500 1050,500 L 1540,500" 
+                      class="hero-path" style="stroke: rgba(255,255,255,0.1);" />
+                
+                <!-- Animated Dash -->
+                <path d="M -100,500 L 150,500 Q 200,500 200,450 L 200,400 Q 200,350 250,350 L 950,350 Q 1000,350 1000,400 L 1000,450 Q 1000,500 1050,500 L 1540,500" 
+                      class="hero-path-animated" style="stroke: rgba(255,255,255,0.3); animation-delay: -6s;" />
+            </svg>
+        </div>
+
+        <div class="max-w-3xl mx-auto relative z-10 reveal-on-scroll">
             <h2 class="font-heading text-3xl md:text-4xl font-semibold mb-6 leading-tight">
                 In einem Jahr wirst du dir wünschen, du hättest heute angefangen.
             </h2>
@@ -491,7 +755,7 @@
                 Die KI-Revolution wartet nicht. Deine Konkurrenz schläft nicht.
             </p>
             <div class="flex flex-col sm:flex-row items-start gap-4">
-                <a href="https://communi.com/ki-automation/checkout" class="inline-block bg-cta hover:bg-cta-hover text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors duration-200 cursor-pointer">
+                <a href="https://communi.com/ki-automation/checkout" class="inline-flex items-center justify-center bg-cta hover:bg-cta-hover text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg hover:shadow-glow hover:-translate-y-1 cursor-pointer">
                     Für 300€/Jahr beitreten
                 </a>
                 <div class="text-sm text-white/60 self-center">
@@ -528,6 +792,26 @@
                 scrollTopBtn.classList.add('opacity-0', 'invisible');
                 scrollTopBtn.classList.remove('opacity-100', 'visible');
             }
+        });
+
+        // Intersection Observer for Scroll Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
+            observer.observe(element);
         });
     </script>
 
